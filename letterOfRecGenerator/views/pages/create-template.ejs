@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel="stylesheet" href="/stylesheets/style.css" />
+        <link rel="stylesheet" href="/css/create-template.css" />
+        <script type="text/javascript" src="/javascripts/create-template.js"></script>
+    </head>
+    <body>
+        <header>
+            <% include ../partials/header %>
+        </header>
+        <h1 class="title"><%= title %></h1>
+
+        <div id="questions-container"></div>
+
+        <button class="large-plus-button" onclick="addQuestion()">+</button>
+        <div class="flex-row">
+            <button id="save-button" onclick="saveTemplate()">Save</button>
+        </div>
+    </body>
+
+    <div id="add-question-modal">
+        <div class="content">
+            <div class="flex-row">
+                <h1>Select Question Type</h1>
+            </div>
+            <div class="flex-row">            
+                <button onclick="addTextAnswerQuestion()">Text Answer</button>
+            </div>
+            <div class="line"></div>
+            <div class="flex-row">            
+                <button>Radio Button</button>
+            </div>
+            <div class="line"></div>
+            <div class="flex-row">            
+                <button>Checkbox</button>
+            </div>
+        </div>
+    </div>
+</html>

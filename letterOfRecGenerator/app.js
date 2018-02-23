@@ -10,6 +10,7 @@ var login = require('./routes/login');
 var recommenderDashboard = require('./routes/recommender-dashboard');
 var templateDashboard = require('./routes/template-dashboard');
 var users = require('./routes/users');
+<<<<<<< HEAD
 var rec = require('./routes/rec');
 var {google} = require('googleapis');
 var querystring = require('querystring');
@@ -18,6 +19,9 @@ var OAuth2 = google.auth.OAuth2;
 
 
 var expiryDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+=======
+var createTemplate = require('./routes/create-template');
+>>>>>>> 52c664ec9e05d218f99f24a474b169f8aefe7bdb
 
 var app = express();
 
@@ -70,11 +74,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/login', login);
+
 app.use('/recommender-dashboard', isAuthenticated, recommenderDashboard);
 app.use('/template-dashboard', isAuthenticated, templateDashboard)
 app.use('/users', isAuthenticated, users);
 app.use('/rec', isAuthenticated, rec);
-
+app.use('/create-template', isAuthenticated, createTemplate)
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     var err = new Error('Not Found');
