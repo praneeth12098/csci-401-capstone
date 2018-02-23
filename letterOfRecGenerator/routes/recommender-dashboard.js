@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
+var crypto = require('crypto');
 var nodemailer = require('nodemailer');
+var link = require('../models/link');
 
 router.use(function (req, res, next) {
     res.locals.statusMessage = null;
@@ -36,12 +38,14 @@ router.post('/', function(req, res, next) {
     }
 
     // setup email data with unicode symbols
+    const hash = crypto.createHash('md5').update(email + '<no-reply@example.com>').digest("hex");
+    link.create({link: hash});
     let mailOptions = {
         from: '<no-reply@example.com>', // sender address
         to: email, // list of receivers
         subject: 'Invitation to Fill Recommendation Letter Questionairre', // Subject line
         text: 'Please click the following questionairre link.', // plain text body
-        html: '<p>Please click the following questionairre link.</p>' // html body
+        html: '<p>Please click the following questionairre <a href = "localhost:3000/rec/' + hash + '">link.</a></p>' // html body
     };
 
     // send mail with defined transport object

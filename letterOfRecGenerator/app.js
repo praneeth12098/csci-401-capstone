@@ -10,6 +10,7 @@ var login = require('./routes/login');
 var recommenderDashboard = require('./routes/recommender-dashboard');
 var templateDashboard = require('./routes/template-dashboard');
 var users = require('./routes/users');
+var rec = require('./routes/rec');
 var {google} = require('googleapis');
 var querystring = require('querystring');
 var url = require('url');
@@ -72,6 +73,7 @@ app.use('/login', login);
 app.use('/recommender-dashboard', isAuthenticated, recommenderDashboard);
 app.use('/template-dashboard', isAuthenticated, templateDashboard)
 app.use('/users', isAuthenticated, users);
+app.use('/rec', isAuthenticated, rec);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
