@@ -47,7 +47,7 @@
                         </td>
                         <td class="center">
                             <img class="status" src="/images/pencil.png"/>
-                            <img class="status" src="/images/preview.png"/>
+                            <img class="status" src="/images/preview.png" onclick="letterPreview()">
                             <img class="status" src="/images/delete.png" onclick="DeleteRowFunction(this)"/>
                         </td>
                     </tr>
@@ -83,7 +83,10 @@
                 p.parentNode.removeChild(p);
             } 
 
-
+            // When the user clicks the preview icon, take them to the letter preview page.
+            function letterPreview(){
+                window.location = "/letter-preview";
+            }
         </script>
     </body>
 </html>

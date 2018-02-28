@@ -11,6 +11,7 @@ var login = require('./routes/login');
 var recommenderDashboard = require('./routes/recommender-dashboard');
 var templateCreation = require('./routes/template-creation');
 var templateDashboard = require('./routes/template-dashboard');
+var letterPreview = require('./routes/letter-preview');
 var users = require('./routes/users');
 
 var app = express();
@@ -32,7 +33,8 @@ app.use('/form-entry', formEntry);
 app.use('/login', login);
 app.use('/recommender-dashboard', recommenderDashboard);
 app.use('/template-creation', templateCreation);
-app.use('/template-dashboard', templateDashboard)
+app.use('/template-dashboard', templateDashboard);
+app.use('/letter-preview', letterPreview);
 app.use('/users', users);
 
 // catch 404 and forward to error handler
