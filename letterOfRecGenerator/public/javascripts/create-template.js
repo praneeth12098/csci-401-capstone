@@ -60,6 +60,21 @@ function addQuestion() {
 
 function saveTemplate() {
     console.log("saveTemplate called");
+
+    var template = {}
+    template["name"] = "temp";
+    templateQuestions = []
+    for (q of questions) {
+        templateQuestions.push({
+            type: q.type,
+            question: q.value,
+            number: q.id,
+            tag: q.tag || "",
+        });
+    }
+    template["questions"] =  templateQuestions;
+
+    console.log(JSON.stringify(template));
 }
 
 function showAddQuestionModal() {
