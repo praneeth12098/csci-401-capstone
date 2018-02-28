@@ -29,6 +29,7 @@
                     <td>Name</td>
                     <td>Template</td>
                     <td class="center">Status</td>
+                    <td> </td>
                 </tr>
             </thead>
             <tbody>
@@ -43,6 +44,11 @@
                             <% } else { %>
                                 <img class="status" src="/images/green_checkmark.png"/>
                             <% } %>
+                        </td>
+                        <td class="center">
+                            <img class="status" src="/images/pencil.png"/>
+                            <img class="status" src="/images/preview.png"/>
+                            <img class="status" src="/images/delete.png" onclick="DeleteRowFunction(this)"/>
                         </td>
                     </tr>
                 <% } %>
@@ -69,6 +75,15 @@
                     modal.style.display = "none";
                 }
             }
+
+            // On click for trash icon
+            function DeleteRowFunction(o) {
+                // Deletes row
+                var p = o.parentNode.parentNode;
+                p.parentNode.removeChild(p);
+            } 
+
+
         </script>
     </body>
 </html>
