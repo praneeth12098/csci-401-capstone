@@ -12,9 +12,13 @@
         </header>
         <h1 class="title"><%= title %></h1>
 
+        <div id="letter-container">
+            <textarea id="letter-text-area"></textarea>
+        </div>
+
         <div id="questions-container"></div>
 
-        <button class="large-plus-button" onclick="addQuestion()">+</button>
+        <button class="large-circle-button" onclick="addQuestion()">+</button>
         <div class="flex-row">
             <button id="save-button" onclick="saveTemplate()">Save</button>
         </div>
