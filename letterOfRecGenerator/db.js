@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 
 var mongoDB = 'mongodb://68.181.97.191:12345/test';
 mongoose.connect(mongoDB);

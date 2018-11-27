@@ -3,3 +3,26 @@
     height: 40px;
     width: 100%;
 }
+
+img{
+    /*float:left;*/
+    height: 40px;
+    margin-left: 10px;
+}
+
+
+a{
+    font-size: 15px;
+    color:#FFCC00;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-decoration: none;
+    margin-top: 10px;
+    float:left;
+}
+
+#logout{
+    float: right;
+    margin-right: 30px;
+} 
+

@@ -1,57 +1,18 @@
-.title {
+
+
+.templates{
     background-color: #FFFFFF;
-    font-size: 32px;
-    margin: 0;
-    padding: 20px 8px;
 }
 
-body {
-    background-color: #F2F2F2;
-}
-
-/* The Modal (background) */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
-
-.addBtn {
-    background-color: #C4C4C4;
-    border-radius: 50%;
-    bottom: 8px;
-    cursor: pointer;
-    display: table-cell;
-    font-size: 28px;
-    line-height: 40px;
-    height: 40px;
-    position: fixed;
-    right: 8px;
+.addBtn{
+    background-color: transparent;
+    border: none;
     text-align: center;
-    vertical-align: middle;
-    width: 40px;
-    z-index: 1;
-}
-
-/* Modal Content/Box */
-.modal-content {
-    background-color: #FFFFFF;
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
-    width: 60%; /* Could be more or less, depending on screen size */
-}
-
-.modal-title {
-    color: #EB5757;
-    font-size: 36px;
-    margin: 0;
+    text-decoration: none;
+    display: inline-block;
+    float: right;
+    font-size: 16px;
+    outline-style: none;
 }
 
 /* The Close Button */
@@ -79,50 +40,31 @@ body {
     text-align: center;
 }
 
-.input-text {
-    font-size: 20px;
-    line-height: 20px;
-    width: 100%;
-}
-
 .input-submit {
     background-color: #FF473A;
-    font-size: 16px;
-    margin-top: 16px;
-    width: 200px;
-    height: 50px;
-}
-table {
-    background-color: #FFFFFF;
-    border-collapse: collapse;
-    font-size: 20px;
-    width: 100%;
-}
-
-td {
-    padding-left: 8px;
-}
-
-table thead tr {
-    border-bottom: solid 1px black;
+    font-size: 12px;
+    margin-top: 50px;
+    width: 180px;
+    height: 40px;
+    transition: 0.6s;
+    border-radius: 20px;
+    border: none;
+    color: white;
+    letter-spacing: 2px;
+    float: right;
+    opacity: 1.0;
+    -webkit-box-shadow: 6px 4px 21px 1px rgba(0,0,0,0.21);
+    -moz-box-shadow: 6px 4px 21px 1px rgba(0,0,0,0.21);
+    box-shadow: 6px 4px 21px 1px rgba(0,0,0,0.21);
+    text-transform: uppercase;
 }
 
-table tbody tr {
-    border-bottom: solid 1px black;
-    height: 150px;
+.input-submit:hover {
+    cursor: pointer;
+    opacity: 0.6;
 }
 
-table tbody tr td {
-    position: relative;
-}
 
-td.center {
-    text-align: center;
-}
-
-table tbody tr:last-child {
-    border-bottom: none;
-}
 
 .image-container {
     position: absolute;
@@ -131,15 +73,27 @@ table tbody tr:last-child {
     transform: translateY(-50%);
 }
 
-.template-name {
-    left: 50%;
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
+img.icon {
+    height: 25px;
+    width: 25px;
+    opacity: 1;
+    transition: 0.6s;
 }
 
-img.icon {
+img.icon:hover {
+    opacity: 0.5;
     cursor: pointer;
-    height: 30px;
-    width: 30px;
+}
+
+.subtitle {
+    font-size: 18px; 
+}
+
+.subtitle_cont {
+    padding-bottom: 10px; 
+}
+
+.template-modal {
+    margin-top: 15%;
+    height: 230px;
 }

@@ -7,7 +7,6 @@ var LinkSchema = new Schema({
     link: String,
     createdAt: {
         type: Date,
-        expires: 259200,
         default: Date.now
     }
 });

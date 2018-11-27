@@ -4,67 +4,110 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="/stylesheets/style.css"/>
     <link rel="stylesheet" href="/css/template-editor.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/all.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" src="/javascripts/template-editor.js" id="<%= id %>"
-            letterheadImgData="<%= letterheadImage %>" footerImgData="<%= footerImage %>"></script>
+            letterheadImgData="<%= letterheadImage %>" footerImgData="<%= footerImage %>" saveSwitchData="<%= saveSwitch %>"></script>
+    <script src="//rubaxa.github.io/Sortable/Sortable.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.1/trix.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.1/trix.js"></script>
+
 </head>
 <body>
-<header>
-    <% include ../partials/header %>
-</header>
-<h1 class="title"><%= title %></h1>
+<div id="tmp-editor-cont" class = "templates">
+    <header>
+        <% include ../partials/header %>
+    </header>
+    <p class="title"><%= title %></p>
+    <div id="template-editor-container">
+        <div class="error-container">
+            <div id="name-container">
+                <h2 class="section-header">Template Name</h2>
+                <input id="name-container-text-field" type="text" class="text-field" placeholder="Enter a template name here..."
+                       value="<%= templateName %>"/>
+            </div>
+        </div>
 
-<h2 class="section-header">Template Name</h2>
-<div class="error-container">
-    <div id="name-container">
-        <input id="name-container-text-field" type="text" class="text-field" placeholder="Enter a template name here..."
-               value="<%= templateName %>"/>
+        <div class="flex-display upload-cont">
+            <h2 id="upload-letterhead" class="section-header">Upload Template</h2>
+            <div class="upload-preview-container flex1">
+
+                <% if(locals.letterheadImage){ %>
+                <img id="letterhead-preview" src="<%= letterheadImage %>" alt=""/>
+                <% } else{ %>
+                <img id="letterhead-preview" src="#" alt=""/>
+                <% } %>
+                <div id="letterhead-preview-div"></div>
+                <form id="letterhead-upload" action="/template-editor/fileUpload" method="POST" encType="multipart/form-data" onsubmit="changeText()">
+                    <input type="file" name="file" id="letterhead-upload-file"/>
+                    <input id="file-submit" type="submit" name="Submit"/>
+                </form>
+            </div>
+        </div>
+
+
+        <h2 id="custom-questions" class="section-header">Custom Questions</h2>
+        <button class="large-circle-button" onclick="addQuestion()">+ Add question</button>
+        <div id="questions-container"></div>
+
+        <div class="flex-display all-tags-cont">
+            <h2 id="tags-heading-main" class="section-header">Tags</h2>
+            <div class="flex1">
+                <p id="tag-heading">&lt!TAG_NAME&gt in the letter will be replaced by the corresponding question's answer. 
+                    Tags can be nested in the replacement text of other questions.</p>
+                <p id="tags-heading">All Tags: </p>
+                <div id="tag-container">
+                    <% for (var q=0; q < questions.length; q++) { %>   
+                        <% let options = questions[q].options; %>
+                        <% if(options) { %>
+                            <% for (var o=0; o < options.length; o++) { %> 
+                                <% if(options[o].tag) { %>
+                                    <button class="popup"  name="tag_buttons" value ="<%= options[o].tag %>"><%= options[o].tag %>
+                                        <span class="popup-text">
+                                            <%= questions[q].question %>
+                                        </span>
+                                    </button>
+                                <% } %>
+                            <% } %>
+                        <% } %>
+                        <% if(!options || questions[q].type === "Text" || questions[q].type === "Radio Button") { %>
+                            <button class="popup"  name="tag_buttons" value ="<%= questions[q].tag %>"><%= questions[q].tag %>
+                                <span class="popup-text">
+                                    <%= questions[q].question %>
+                                </span>
+                            </button>
+                        <% } %>
+                    <% } %>
+                    <br/>   
+                </div> 
+                <br>
+
+            </div> 
+        </div>
+
+        <div class="error-container">
+            <div id="letter-container">
+                <h2 id="letter-boilerplate" class="section-header">Letter Boilerplate</h2>
+                <div class="flex1">
+                    <trix-editor class="trix-content" id="letter-text-area"></trix-editor>
+                </div>
+            </div>
+        </div>
+        
+        <br/><br/>
+        <%  if (typeof saveSwitch == "boolean") { 
+            if(saveSwitch){%>
+            <div class="flex-row">
+                <button id="save-button" onclick="saveTemplate()">Save</button>
+            </div>
+        <% }} else if (typeof saveSwitch == "string") { 
+                if (saveSwitch == "true"){%>
+            <div class="flex-row">
+                <button id="save-button" onclick="saveTemplate()">Save</button>
+            </div>
+        <% }} %>
     </div>
-</div>
 
-<h2 class="section-header">Upload Letterhead</h2>
-<div class="upload-preview-container">
-    <% if(locals.letterheadImage){ %>
-    <img id="letterhead-preview" src="<%= letterheadImage %>" alt=""/>
-    <% } else{ %>
-    <img id="letterhead-preview" src="#" alt=""/>
-    <% } %>
-    <form id="letterhead-upload">
-        <input type="file" name="file" id="letterhead-upload-file"/>
-        <input type="submit" name="Submit"/>
-    </form>
-</div>
-
-<h2 class="section-header">Upload Footer</h2>
-<div class="upload-preview-container">
-    <% if(locals.footerImage){ %>
-    <img id="footer-preview" src="<%= footerImage %>" alt=""/>
-    <% } else{ %>
-    <img id="footer-preview" src="#" alt=""/>
-    <% } %>
-    <form id="footer-upload">
-        <input type="file" name="file" id="footer-upload-file"/>
-        <input type="submit" name="Submit"/>
-    </form>
-</div>
-
-<h2 class="section-header">Letter Boilerplate</h2>
-<div class="error-container">
-    <div id="letter-container">
-        <div id="letter-text-area" contentEditable="true" id="text" onfocus="deemphasizeTags()"
-             onblur="emphasizeTags()"></div>
-        <h3>&lt!TAG_NAME&gt in the letter will be replaced by the corresponding question's answer</h3>
-        <h3>Tags can be nested in the replacement text of other questions.</h3>
-    </div>
-</div>
-
-<h2 class="section-header">Custom Questions</h2>
-
-<div id="questions-container"></div>
-
-<button class="large-circle-button" onclick="addQuestion()">+</button>
-<div class="flex-row">
-    <button id="save-button" onclick="saveTemplate()">Save</button>
 </div>
 </body>
 
@@ -73,15 +116,15 @@
         <div class="flex-row">
             <h1>Select Question Type</h1>
         </div>
-        <div class="flex-row">
+        <div class="flex-row option-cont">
             <button onclick="addTextAnswerQuestion()">Text Answer</button>
         </div>
         <div class="line"></div>
-        <div class="flex-row">
+        <div class="flex-row option-cont">
             <button onclick="addRadioButtonQuestion()">Radio Button</button>
         </div>
         <div class="line"></div>
-        <div class="flex-row">
+        <div class="flex-row option-cont">
             <button onclick="addCheckboxQuestion()">Checkbox</button>
         </div>
     </div>
@@ -99,3 +142,134 @@
     </div>
 </div>
 </html>
+
+<script>
+    $("button[name='tag_buttons']").on("click", function (e) {
+        var val = $(this).val();
+        var theDiv = document.getElementById("letter-text-area");
+        var content = document.createTextNode(val);
+        theDiv.appendChild(content);
+    }); 
+</script>
+
+
+<script>
+
+    var letterContent = document.getElementById("letter-text-area");
+    var firstHalf = ""; 
+    var secondHalf = ""; 
+    var letterContentCursorPos = -1; 
+    
+    letterContent.onclick = function () {
+        // creates dummy node to find cursor position
+        var target = document.createTextNode("\u0001");
+        document.getSelection().getRangeAt(0).insertNode(target);
+        var position = letterContent.innerHTML.indexOf("\u0001");
+        target.parentNode.removeChild(target);
+
+        letterContentCursorPos = position; 
+        var letterContentInnerHTML = letterContent.innerHTML; 
+        firstHalf = letterContentInnerHTML.substring(0, letterContentCursorPos); 
+        secondHalf = letterContentInnerHTML.substring(letterContentCursorPos); 
+    };
+
+    letterContent.onkeyup = function () {
+        letterContentCursorPos = letterContent.innerHTML.length; 
+    }
+
+    // so you can click tags directly after typing
+   $("#letter-text-area").focusout(function () {
+        var letterContentInnerHTML = letterContent.innerHTML; 
+        firstHalf = letterContentInnerHTML.substring(0, letterContentCursorPos); 
+        secondHalf = letterContentInnerHTML.substring(letterContentCursorPos);
+    }); 
+
+    $(window).click(function (e) {
+        renderAllTagButtons(); 
+    });
+    
+    function renderAllTagButtons() {
+        // clear old tag buttons
+        let tagsContainer = document.getElementById("tag-container");
+        while (tagsContainer.firstChild) {
+            tagsContainer.removeChild(tagsContainer.firstChild);
+        }
+        // create new tags buttons
+        let allQuestions = document.querySelectorAll(".question-container");
+        for (var i = 0; i < allQuestions.length; i++) {
+            let currQuestonEle = allQuestions[i]; 
+            let questionText = currQuestonEle.querySelector("[data-type='value']").value; 
+            let allTagsInQuestion = currQuestonEle.querySelectorAll("[data-type='tag']");
+            for (var j = 0; j < allTagsInQuestion.length; j++) {
+                let currTagValue = allTagsInQuestion[j].value;
+                // create button
+                let tagValue = currTagValue.substring(currTagValue.lastIndexOf("!") + 1, currTagValue.lastIndexOf(">"));
+                if (tagValue) {
+                    let newButton = createTagButton(tagValue, questionText); 
+                    tagsContainer.appendChild(newButton);
+                }
+            }
+        }
+    }
+
+    function createTagButton(tagValue, questionText) {
+        // create button
+        let newButton = document.createElement("BUTTON");
+        newButton.type = "button";
+        newButton.value = "<!" + tagValue + ">";
+        newButton.value.trim();
+        newButton.innerHTML = "&lt;!" + tagValue + "&gt;";
+        newButton.name = "tag_buttons";
+        newButton.onclick = function () {
+
+            // if clicked and focused, add append to back
+
+            if (letterContentCursorPos === -1) {
+                
+                var val = $(this).val();
+                var theDiv = document.getElementById("letter-text-area");
+                var content = document.createTextNode(" " + val);
+                theDiv.appendChild(content);
+            } else {
+                var entire = firstHalf + "&lt;!" + tagValue + "&gt;" + secondHalf; 
+                letterContent.innerHTML = entire; 
+
+                letterContentCursorPos = -1; 
+                firstHalf = ""; 
+                secondHalf = ""; 
+            }
+            return false;
+        };
+
+        // create span child
+        let newSpan = createSpanChild(questionText); 
+        newButton.appendChild(newSpan); 
+        newButton.onmouseover = function() {
+            newSpan.style.visibility = "visible";
+        }
+        newButton.onmouseout = function() {
+            newSpan.style.visibility = "hidden";
+        }
+        
+        return newButton; 
+    }
+
+    function createSpanChild(questionText) {
+        let newSpan = document.createElement("span"); 
+        newSpan.className = "popup-text";
+        newSpan.style.visibility = "hidden";
+        newSpan.style.width = "200px";
+        newSpan.style.backgroundColor = "black";
+        newSpan.style.color = "#fff";
+        newSpan.style.textAlign = "center";
+        newSpan.style.padding = "5px 0";
+        newSpan.style.borderRadius = "6px";
+        newSpan.style.position = "absolute";
+        newSpan.style.zIndex = "1";
+        newSpan.style.marginLeft = "-100px";
+        newSpan.style.marginTop = "20px"; 
+        newSpan.innerHTML = questionText;
+        return newSpan; 
+    }
+</script>
+

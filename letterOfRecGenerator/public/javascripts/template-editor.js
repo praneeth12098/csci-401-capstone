@@ -8,12 +8,14 @@ var errorScrollCoordinates = {
 var id = parseAttribute('id');
 var letterheadImgData = parseAttribute('letterheadImgData');
 var footerImgData = parseAttribute('footerImgData');
+var saveSwitchData = parseAttribute('saveSwitchData');
+const TRIX_EDITOR = "trix-editor";
 
 /**
  * Prototype class for Questions
  */
 class Question {
-    constructor(type, value, tag, optional = false) {
+    constructor(type, value, tag, optional = false, orgQuestion = false) {
         // Text, Radio Button, Checkbox
         this.type = type;
         this.value = value;
@@ -25,6 +27,19 @@ class Question {
         // tag is always empty string for radio button options
         this.options = [];
         nextQuestionIdToUse++;
+        this.isOrganizationQuestion = orgQuestion;
+    }
+    
+    setId(id) {
+        this.id = id;
+    }
+
+    setOptions(options) {
+        this.options = options;
+    }
+
+    setOrganizationQuestion (booleanValue) {
+        this.isOrganizationQuestion = booleanValue;
     }
 }
 
@@ -34,41 +49,60 @@ const QUESTIONS_CONTAINER_ID = "questions-container";
 const ADD_QUESTION_MODAL_ID = "add-question-modal";
 const WARNING_MODAL_ID = "warning-modal";
 
+const CUSTOM_QUESTION_TYPE = "Custom";
+
 let letter = "";
 var questions = [];
+var tags = [];
 var warningModalFunction;
 
 window.onload = function () {
-    setUpEventHandlers();
+    //setUpEventHandlers();
+    document.getElementById(LETTER_TEXT_AREA_ID).addEventListener('paste', function (e) {
+        e.preventDefault();
+
+        if (e.clipboardData) {
+            content = (e.originalEvent || e).clipboardData.getData('text/plain');
+            document.execCommand('insertText', false, content);
+        } else if (window.clipboardData) {
+            content = window.clipboardData.getData('Text');
+            document.selection.createRange().pasteHTML(content);
+        }
+    });
 
     if (id) {
         $.ajax({
-            url: `http://68.181.97.191:3000/template-editor/template`,
-            data: {id},
+            url: 'http://68.181.97.191:3000/template-editor/template',
+            data: {id, saveSwitchData},
             type: 'GET',
             success: function (data) {
-                document.getElementById(LETTER_TEXT_AREA_ID).innerHTML = encodeLetterHTML(data.letter);
+                document.getElementById(LETTER_TEXT_AREA_ID).innerHTML = data.letter;
                 data.questions.forEach(question => {
-                    var savedQuestion = new Question(question.type, question.question, question.tag, question.optional);
+                    var savedQuestion = new Question(question.type, question.question, question.tag, question.optional, question.isOrganizationQuestion);
                     savedQuestion.options = question.options;
                     questions.push(savedQuestion);
                 });
                 console.log('success');
                 displayQuestions();
-                emphasizeTags();
+                //emphasizeTags();
             },
             error: function () {
                 console.log('error');
             }
         });
+
     } else {
         loadDefaultQuestions();
         displayQuestions();
     }
+
 };
 
+// creates default questions
 function loadDefaultQuestions() {
-    var default1 = new Question("Text", "What is your name?", "<!NAME>");
+    var default0 = new Question("Text", "What is your first name?", "<!FNAME>");
+    questions.push(default0);
+    var default1 = new Question("Text", "What is your last name?", "<!LNAME>");
     questions.push(default1);
     var default2 = new Question("Radio Button", "What is your preferred personal pronoun (subject)?", "<!SUB_PRONOUN>");
     default2.options = [constructOptionObject("He", "he"), constructOptionObject("She", "she"), constructOptionObject("They", "they")];
@@ -79,42 +113,26 @@ function loadDefaultQuestions() {
     var default4 = new Question("Radio Button", "What is your preferred possessive pronoun?", "<!POS_PRONOUN>");
     default4.options = [constructOptionObject("His", "his"), constructOptionObject("Her", "her"), constructOptionObject("Their", "their")];
     questions.push(default4);
+    var orgQuestion = new Question("Custom", "What organizations are you applying to?", "<!ORGANIZATION>");
+    orgQuestion.options = [constructOptionObject("Organization", "", "<!ORG>")];  
+    questions.push(orgQuestion);
+
 }
 
-function setUpEventHandlers() {
-    // upload letterhead
-    $('#letterhead-upload').submit(function (evt) {
-        evt.preventDefault();
-        var files = $('#letterhead-upload-file')[0].files;
-        if (files && files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $('#letterhead-preview').attr('src', e.target.result);
-                letterheadImgData = e.target.result;
-            };
+function changeText() {
+    var files = $('#letterhead-upload-file')[0].files;
+    if (files && files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#letterhead-preview').attr('src', e.target.result);
+            letterheadImgData = e.target.result;
+            var filename = files[0].name;
+            document.getElementById("letterhead-preview-div").innerHTML = "Uploaded File: " + filename;
+        };
 
-            reader.readAsDataURL(files[0]);
-        }
-
-        return false;
-    });
-
-    // upload footer
-    $('#footer-upload').submit(function (evt) {
-        evt.preventDefault();
-        var files = $('#footer-upload-file')[0].files;
-        if (files && files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $('#footer-preview').attr('src', e.target.result);
-                footerImgData = e.target.result;
-            };
-
-            reader.readAsDataURL(files[0]);
-        }
-
-        return false;
-    });
+        reader.readAsDataURL(files[0]);
+    }
+    
 }
 
 window.onclick = function (event) {
@@ -127,14 +145,22 @@ window.onclick = function (event) {
 function displayQuestions() {
     // grab the container that will hold all questions
     var container = document.getElementById(QUESTIONS_CONTAINER_ID);
-
+    
     // fill in with questions
     container.innerHTML = "";
     for (var i = 0; i < questions.length; i++) {
         container.innerHTML += getQuestionHTML(questions[i]);
     }
+
+    let list = document.getElementById(QUESTIONS_CONTAINER_ID);
+    Sortable.create(list);
 }
 
+/**
+ * Creates HTML for the different question types
+ * @param q
+ * @returns {string}
+ */
 function getQuestionHTML(q) {
     var data_id_attribute = "data-id=\"" + q.id + "\"";
     var delete_onclick_attribute = "onclick=\"deleteQuestionWithWarning(" + q.id + ")\"";
@@ -152,30 +178,37 @@ function getQuestionHTML(q) {
         case "Checkbox":
             question_type_label = "CHECKBOX";
             break;
+        case "Custom":
+            question_type_label = "Custom";
+            break;
         default:
             break;
     }
 
-    var html = "<h2 class=\"question-header\">" + question_type_label + "</h2>" + "<div class=\"error-container\"><div class=\"question-outer-container\"" + data_id_attribute + ">";
-    // "required" checkbox
-    html += "<div class=\"required-checkbox-container\">" + "<p>Required?</p>" + "<input type=\"checkbox\" ";
+    var html = "<div class=\"sortable-questions\"> <h2 class=\"question-header\"> <b>Question Type: </b>" + question_type_label + "</h2>" + "<img class=\"icon-effects\" src=\"/images/outline-reorder-24px.svg\">" + "<div class=\"error-container\"><div class=\"question-outer-container\"" + data_id_attribute + ">";
+     // "required" checkbox
+    html += "<div class=\"required-checkbox-container\">" + "<p>Required?" + "<input type=\"checkbox\" ";
     html += (q.optional ? "" : "checked");
-    html += ">" + "</div>";
-    // question box
-    html += "<div class=\"question-container\">" + getTextAreaHTML(placeholder, q.value) + multiple_choice_fields_html;
-    if (q.type !== "Checkbox") {
-        html += "<span class=\"line\"></span>" + getTagTextInputHTML(q.tag);
+    html += ">" + "</p></div>";
+
+    // question box  
+    html += [ "<div class=\"question-container\"> <b>Question:</b>" +
+    getTextAreaHTML(placeholder, q.value) +
+    multiple_choice_fields_html ];
+
+    if (q.type !== "Checkbox" && q.type !== "Custom") {
+        html += "<span class=\"line\"></span> <b>Tag:</b>" + getTagTextInputHTML(q.tag);
     }
     html += "</div>";
-    // delete button
     html += "<button class=\"question-button small-circle-button\" " + delete_onclick_attribute + ">X</button>";
-    html += "</div></div>";
+    html += "</div></div></div>";
+
     return html;
 }
-
+   
 // Note: the html needs to be nested within a question-container element in order to properly work
 function getMultipleChoiceFieldsHTML(q) {
-    if (q.type != "Radio Button" && q.type != "Checkbox") return "";
+    if (q.type !== "Radio Button" && q.type !== "Checkbox" && q.type !== "Custom") return "";
 
     var option_placeholder = "Enter option here...";
     var fill_placeholder = "Enter text that will replace the tag... (optional)";
@@ -185,7 +218,7 @@ function getMultipleChoiceFieldsHTML(q) {
         var delete_onclick_attribute = "onclick=\"deleteMultipleChoiceFieldWithWarning(this," + i + ")\"";
 
         var text_area_elements = "<div class=\"text-area-container\">" + getTextAreaHTML(option_placeholder, q.options[i].option, 'option') + getTextAreaHTML(fill_placeholder, q.options[i].fill);
-        if (q.type === "Checkbox") {
+        if (q.type === "Checkbox" || q.type === "Custom") {
             //text_area_elements += getTextAreaHTML()
             text_area_elements += getTagTextInputHTML(q.options[i].tag);
         }
@@ -199,6 +232,13 @@ function getMultipleChoiceFieldsHTML(q) {
     return html;
 }
 
+/**
+ * Generates html for input field
+ * @param placeholder - of input field
+ * @param value
+ * @param name
+ * @returns {string}
+ */
 function getTextAreaHTML(placeholder, value, name) {
     if (name) {
         return "<textarea name=\"" + name + "\" data-type=\"value\" class=\"text-area\" type=\"text\" placeholder=\"" + placeholder + "\" onkeyup=\"auto_grow(this)\">" + value + "</textarea>";
@@ -218,12 +258,10 @@ function auto_grow(element) {
 }
 
 function addQuestion() {
-    console.log("addQuestion called");
     showAddQuestionModal();
 }
 
 function saveTemplate() {
-    console.log("saveTemplate called");
     updateQuestions();
 
     var template = {
@@ -247,7 +285,6 @@ function saveTemplate() {
     }
 
     if (id) {
-        console.log("updating template");
         $.ajax({
             url: `http://68.181.97.191:3000/template-editor/update`,
             data: {
@@ -263,8 +300,13 @@ function saveTemplate() {
                 console.log('success');
                 window.location.href = `http://68.181.97.191:3000/template-dashboard`
             },
-            error: function () {
-                console.log('error');
+            error: function (err){
+                console.log('error in saveTemplate:' + err);
+                var textField = document.getElementById(NAME_CONTAINER_TEXT_FIELD_ID);
+                addError(textField, 0, 'template name already exists');
+                window.scrollTo(errorScrollCoordinates.x, errorScrollCoordinates.y);
+                emphasizeTags();
+                return;
             }
         });
     } else {
@@ -278,12 +320,16 @@ function saveTemplate() {
             },
             success: function (data) {
                 id = data.id;
-
                 console.log('success');
                 window.location.href = `http://68.181.97.191:3000/template-dashboard`
             },
-            error: function () {
-                console.log('error');
+            error: function (err) {
+                console.log('error in saveTemplate:' + err);
+                var textField = document.getElementById(NAME_CONTAINER_TEXT_FIELD_ID);
+                addError(textField, 0, 'template name already exists');
+                window.scrollTo(errorScrollCoordinates.x, errorScrollCoordinates.y);
+                emphasizeTags();
+                return;
             }
         });
     }
@@ -293,13 +339,28 @@ function getQuestions() {
     var dbQuestions = [];
     var questionNumber = 1;
 
-    questions.forEach(question => dbQuestions.push({
+    var sortableQuestionsHTML = document.getElementById(QUESTIONS_CONTAINER_ID).getElementsByClassName("sortable-questions");
+    var updatedQuestions = [];
+    var newQuestionIndex = 0;
+
+    for(var i=0; i<sortableQuestionsHTML.length; i++){      
+        var errorContainerHTML = sortableQuestionsHTML[i].getElementsByClassName("error-container");
+        var questionsOuterContainer = errorContainerHTML[0].getElementsByClassName("question-outer-container");
+        var newQuestion = new Question(questions[i].type, questions[i].value, questions[i].tag, questions[i].optional, questions[i].isOrganizationQuestion);
+        newQuestion.setOptions(questions[i].options);
+        newQuestion.setId(i);
+        updatedQuestions.push(newQuestion);
+    }
+
+    updatedQuestions.forEach(question => dbQuestions.push({
         number: questionNumber++,
         type: question.type,
         question: question.value,
         options: question.options,
         tag: question.tag,
-        optional: question.optional
+        optional: question.optional,
+        organizationFlag: question.isOrganizationQuestion
+
     }));
 
     return dbQuestions;
@@ -334,7 +395,6 @@ function executeWarningModalFunction() {
 // NOTE: need to push new question AFTER updateQuestions(), since display questions relies on a question being displayed once
 // to assign it a data_id
 function addTextAnswerQuestion() {
-    console.log("addTestAnswerQuestion called");
     updateQuestions();
     questions.push(new Question("Text", "", ""));
     displayQuestions();
@@ -342,7 +402,6 @@ function addTextAnswerQuestion() {
 }
 
 function addRadioButtonQuestion() {
-    console.log("addRadioButtonQuestion called");
     updateQuestions();
     var question = new Question("Radio Button", "", "");
     question.options.push(constructOptionObject("", ""));
@@ -352,7 +411,6 @@ function addRadioButtonQuestion() {
 }
 
 function addCheckboxQuestion() {
-    console.log("addCheckboxQuestion called");
     updateQuestions();
     var question = new Question("Checkbox", "", "");
     question.options.push(constructOptionObject("", ""));
@@ -361,21 +419,35 @@ function addCheckboxQuestion() {
     hideAddQuestionModal();
 }
 
+/**
+ * Creates a custom question
+ */
+function addCustomQuestion() {
+    updateQuestions();
+    let question = new Question("Custom", "", "");
+    question.options.push(constructOptionObject("", ""));
+    questions.push(question);
+    displayQuestions();
+    hideAddQuestionModal();
+
+    // add a field
+}
+
 function updateQuestions() {
     // update the letter
-    letter = decodeLetterHTML(document.getElementById(LETTER_TEXT_AREA_ID).innerHTML);
+    var element = document.querySelector(TRIX_EDITOR);
+    letter = element.value;
 
     // update individual questions
     for (var i = 0; i < questions.length; i++) {
         var question = questions[i];
-
         // grab the question element
         var query = "div[data-id='" + question.id + "'][class='question-outer-container']";
         var questionEl = document.querySelector(query);
 
         question.value = questionEl.querySelector("[data-type='value']").value;
         // Checkbox questions do not have a general tag (as there are tags associated with each option instead)
-        if (question.type !== "Checkbox") {
+        if (question.type !== "Checkbox" || question.type !== CUSTOM_QUESTION_TYPE) {
             question.tag = questionEl.querySelector("[data-type='tag']").value;
         }
 
@@ -387,7 +459,7 @@ function updateQuestions() {
 
             question.options[j].option = mc.querySelectorAll("[data-type='value']")[0].value;
             question.options[j].fill = mc.querySelectorAll("[data-type='value']")[1].value;
-            if (question.type === "Checkbox") {
+            if (question.type === "Checkbox" || question.type === CUSTOM_QUESTION_TYPE) {
                 question.options[j].tag = mc.querySelector("[data-type='tag']").value;
             }
         }
@@ -399,6 +471,7 @@ function deleteQuestion(id) {
     for (var i = 0; i < questions.length; i++) {
         if (questions[i].id == id) {
             questions.splice(i, 1);
+            // 
             break;
         }
     }
@@ -484,12 +557,12 @@ function validate(template) {
 
     for (var i = 0; i < template.questions.length; i++) {
         var question = template.questions[i];
-        var query = "div[data-id='" + i + "'][class='question-outer-container']";
+        var query = "div[data-id='" + questions[i].id + "'][class='question-outer-container']";
         var questionHTML = document.querySelector(query);
 
         var totalFields = 3;
         if (question.options.length) {
-            totalFields = question.type === 'Checkbox' ? 4 + 3 * question.options.length : 4 + 2 * question.options.length;
+            totalFields = (question.type === 'Checkbox' || question.type === CUSTOM_QUESTION_TYPE) ? 4 + 3 * question.options.length : 4 + 2 * question.options.length;
         }
 
         if (isNotValid(question.question)) {
@@ -528,7 +601,7 @@ function validate(template) {
             }
         }
 
-        if (question.type === 'Checkbox') {
+        if (question.type === 'Checkbox' || question.type === CUSTOM_QUESTION_TYPE) {
             for (var j = 0; j < question.options.length; j++) {
                 var option = question.options[j];
                 var query = "div[data-id='" + j + "'][class='multiple-choice-container']";
@@ -770,7 +843,7 @@ function isTagsExist(letter, questions) {
 
         if (!question) {
             questions.forEach(function (question) {
-                if (question.type === 'Checkbox') {
+                if (question.type === 'Checkbox' || question.type === CUSTOM_QUESTION_TYPE) {
                     question.options.forEach(function (option) {
                         if (option.tag === tags[i]) {
                             found = true;
@@ -796,5 +869,5 @@ function encodeLetterHTML(text) {
 }
 
 function decodeLetterHTML(text) {
-    return text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&#039;/g, "'").replace(/\<span class\="tag"\>/gi, '').replace(/\<\/span\>/gi, '').replace(/\<div\>/gi, '\n').replace(/\<\/div\>/gi, '').replace(/\<br\>/gi, '\n').replace(/&nbsp/g, ' ');
+    return text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&#039;/g, "'").replace(/\<span class\="tag"\>/gi, '').replace(/\<\/span\>/gi, '').replace(/\<div\>/gi, '\n').replace(/\<\/div\>/gi, '').replace(/\<br\>/gi, '\n').replace(/\&nbsp;/g, ' ');
 }

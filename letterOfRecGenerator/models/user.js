@@ -1,6 +1,7 @@
 var db = require('../db');
 var Form = require("./form");
 var Template = require("./template");
+var Email = require("./email");
 
 var Schema = db.Schema;
 
@@ -9,10 +10,20 @@ var UserSchema = new Schema({
     displayName: String,
     accessToken: String,
     templates: [Template.schema],
+    deactivatedTemplates: [Template.schema],
+    deactivatedEmailTemplates: [Email.schema],
+    emailTemplates: [Email.schema],
     forms: [{
         type: db.Schema.Types.ObjectId,
         ref: 'Form'
-    }]
+    }],
+    linkTemplate_subject: String,
+    linkTemplate_body: String,
+    deactivatedForms: [{
+        type: db.Schema.Types.ObjectId,
+        ref: 'Form'
+    }],
+    emailhistory: [Email.schema]
 });
 
 UserSchema.statics.findUser = function (id, cb) {
@@ -22,7 +33,9 @@ UserSchema.statics.findUser = function (id, cb) {
 };
 
 UserSchema.statics.createUser = function (id, cb) {
-    User.create({id: id}, cb);
+    User.create({id: id, 
+        linkTemplate_subject: 'Invitation to Fill Recommendation Letter Questionairre',
+        linkTemplate_body: 'Please click the following questionaire '}, cb);
 };
 
 UserSchema.statics.findOrCreate = function (id, cb) {
@@ -36,12 +49,56 @@ UserSchema.statics.findOrCreate = function (id, cb) {
 };
 
 UserSchema.methods.addTemplate = function (template, cb) {
-    this.templates.push(template);
-    var newTemplate = this.templates[this.templates.length - 1];
+    var errorFlag = false;
+    for(var i=0; i < this.templates.length; i++) {
+        if(this.templates[i].name == template.name) {
+            cb(new Error("DUPLICATE NAME"));
+            errorFlag = true;
+        }
+    }
+    if(!errorFlag) {
+        this.templates.push(template);
+        var newTemplate = this.templates[this.templates.length - 1];
+        this.save(function (err) {
+            cb(err, newTemplate.getId());
+        })
+    }
+};
 
-    this.save(function (err) {
+UserSchema.methods.addEmailHistory = function (email, cb) {
+    this.emailhistory.push(email);
+    var newTemplate = this.emailhistory[this.emailhistory.length - 1];
+    this.save(function (err, id) {
         cb(err, newTemplate.getId());
     })
+};
+
+UserSchema.methods.addEmailTemplate = function (email, cb) {
+    this.emailTemplates.push(email);
+    var newTemplate = this.emailTemplates[this.emailTemplates.length - 1];
+    this.save(function (err, id) {
+        cb(err, newTemplate.getId());
+    })
+};
+
+UserSchema.methods.updateEmailTemplate = function (id, email, cb) {
+    var user = this;
+    var updatedTemplate = this.emailTemplates.id(id);
+
+    updatedTemplate.title = email.title;
+    updatedTemplate.subject = email.subject;
+    updatedTemplate.body_text = email.body_text;
+
+    User.findOneAndUpdate({
+        "id": user.id,
+        "emailTemplates._id": id
+    }, {
+        "$set": {
+            "emailTemplates.$": updatedTemplate
+        }
+    }, function (err, user) {
+        cb(err);
+    });
 };
 
 UserSchema.methods.updateTemplate = function (id, template, cb) {
@@ -67,16 +124,106 @@ UserSchema.methods.updateTemplate = function (id, template, cb) {
     });
 };
 
+UserSchema.methods.update_linkTemplate_subject = function (subject, cb) {
+    var user = this;
+    this.linkTemplate_subject = subject;
+    User.findOneAndUpdate({
+        "id": user.id
+    }, {
+        "$set": {
+            "linkTemplate_subject": subject
+        }
+    }, function (err, user) {
+        cb(err);
+    });
+};
+
+
+UserSchema.methods.update_linkTemplate_body = function (body, cb) {
+    var user = this;
+    this.linkTemplate_body = body;
+    User.findOneAndUpdate({
+        "id": user.id
+    }, {
+        "$set": {
+            "linkTemplate_body": body
+        }
+    }, function (err, user) {
+        cb(err);
+    });
+};
+
 UserSchema.methods.getTemplates = function () {
     return this.templates;
+};
+
+UserSchema.methods.getDeactivatedTemplates = function () {
+    return this.deactivatedTemplates;
+};
+
+UserSchema.methods.getDeactivatedEmailTemplates = function () {
+    return this.deactivatedEmailTemplates;
 };
 
 UserSchema.methods.getTemplate = function (id) {
     return this.templates.id(id);
 };
 
-UserSchema.methods.removeTemplate = function (id, cb) {
-    this.getTemplate(id).remove();
+UserSchema.methods.getDeactivatedTemplate = function (id) {
+    return this.deactivatedTemplates.id(id);
+};
+
+UserSchema.methods.getDeactivatedEmailTemplate = function (id) {
+    return this.deactivatedEmailTemplates.id(id);
+};
+
+UserSchema.methods.getEmailTemplates = function () {
+    return this.emailTemplates;
+};
+
+UserSchema.methods.getEmailTemplate = function (id) {
+    return this.emailTemplates.id(id);
+};
+
+UserSchema.methods.getEmailHistory = function () {
+    return this.emailhistory;
+};
+
+UserSchema.methods.getAnEmailHistory = function (id) {
+    return this.emailhistory.id(id);
+};
+
+UserSchema.methods.getLinkTemplateSubject = function () {
+    return this.linkTemplate_subject;
+};
+
+UserSchema.methods.getLinkTemplateBody = function () {
+    return this.linkTemplate_body;
+};
+
+/* This removes a specified template from templates array
+and moves it to deactivatedTemplates array */
+UserSchema.methods.deactivateTemplate = function (id, cb) {
+    this.deactivatedTemplates.push(this.getTemplate(id));
+    this.templates.pull(this.getTemplate(id));
+    this.save(cb);
+};
+
+UserSchema.methods.activateTemplate = function (id, cb) {
+    this.templates.push(this.getDeactivatedTemplate(id));
+    this.deactivatedTemplates.pull(this.getDeactivatedTemplate(id));
+    this.save(cb);
+};
+
+UserSchema.methods.deactivateEmailTemplate = function (id, cb) {
+    this.deactivatedEmailTemplates.push(this.getEmailTemplate(id));
+    this.emailTemplates.pull(this.getEmailTemplate(id));
+    this.save(cb);
+};
+
+UserSchema.methods.activateEmailTemplate = function (id, cb) {
+    this.emailTemplates.push(this.getDeactivatedEmailTemplate(id));
+    this.deactivatedEmailTemplates.pull(this.getDeactivatedEmailTemplate(id));
     this.save(cb);
 };
 
@@ -86,6 +233,7 @@ UserSchema.methods.addForm = function (form, cb) {
 };
 
 UserSchema.methods.getForms = function (cb) {
+    // try getting all forms under this user id
     User.findOne({id: this.id}).populate('forms').exec(function (err, user) {
         cb(err, user.forms);
     })
@@ -104,15 +252,30 @@ UserSchema.methods.getForm = function (id, cb) {
     })
 };
 
+UserSchema.methods.getDeactivatedForms = function (cb) {
+    // try getting all forms under this user id
+    User.findOne({id: this.id}).populate('deactivatedForms').exec(function (err, user) {
+        cb(err, user.deactivatedForms);
+    })
+};
+
+UserSchema.methods.getDeactivatedForm = function (id, cb) {
+    User.findOne({id: this.id}).populate({
+        path: 'deactivatedForms',
+        match: {_id: id}
+    }).exec(function (err, user) {
+        if (user.forms.length != 1) {
+            console.log('error');
+        } else {
+            cb(err, user.deactivatedForms[0]);
+        }
+    })
+};
+
 UserSchema.methods.removeForm = function (id, cb) {
     this.forms.pull(id);
-    this.save(function (err) {
-        if (err) {
-            cb(err, null);
-        } else {
-            Form.removeForm(id, cb);
-        }
-    });
+    this.deactivatedForms.push(id);
+    this.save(cb);
 };
 
 var User = db.model('User', UserSchema);

@@ -1,7 +1,7 @@
 .side-nav {
     background-color: #111;
     height: 100%;
-    left: 0;
+    left: 15%;
     overflow-x: hidden;
     padding-top: 40px;
     position: fixed;
@@ -9,6 +9,7 @@
     transition: 0.5s;
     width: 0;
     z-index: 1;
+    opacity: 0.9;
 }
 
 .open-btn {
@@ -18,7 +19,7 @@
 }
 
 .side-nav a {
-    color: #818181;
+    color: #FFCC00;
     display: block;
     font-size: 20px;
     padding: 8px 12px;

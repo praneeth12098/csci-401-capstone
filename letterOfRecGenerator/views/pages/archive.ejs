@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/archive.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/history.css"/>  <!-- for modal -->
+    <link rel="stylesheet" type="text/css" href="/css/all.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/table.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/modal.css"/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<div id="myModal" class="modal">
+    <div class="modal-content archive-modal">
+        <div class="close-container">
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+
+        <p id="email-template-name" class="modal-title"></p>
+
+        <div class="archive-modal-div">
+            <label class="input-label"> Subject Line: </label>
+            <input class="modal-input input-text" id="modal-subject" readonly="readonly">
+        </div>
+
+        <div class="archive-modal-div">
+            <label class="input-label"> Email Body: </label>
+            <textarea class="modal-input input-textarea archive-email-modal-textarea" id='modal-body' readonly="readonly"> </textarea>
+        </div>
+    </div>
+</div>
+
+<body>
+<header>
+    <% include ../partials/header %>
+</header>
+
+
+<div class = "archive">
+
+<p class="title"><%= title %></p>
+<br>
+<br>
+
+<table class="archive-table">
+    <thead>
+        <td class="center"><p class="archive-title">Archived Recommendations</p></td>
+        <button id ="button-show-hide" onclick="showTable('table1')">+</button>
+    </thead>
+</table>
+
+<div id = "table1" style="display: none;">
+<table  class="archive-table">
+    <thead>
+    <tr>
+        <td>Timestamp</td>
+        <td>Name</td>
+        <td>Organization</td>
+        <td>Template</td>
+        <td class="center">Form Status</td>
+        <td class="icons"></td>
+    </tr>
+    </thead>
+    <tbody>
+    <% if (!forms.length) { %> 
+        <tr>
+            <td colspan="6" style="text-align: center;">No Archived Recommendations</td>
+        </tr>
+    <%   } else {
+         for (var form of forms) { %>
+    <tr>
+        <% if (!form.meta.submitted) {%>
+            <td><%= form.meta.sent.toDateString()%><br><%= form.meta.sent.toLocaleTimeString('en-US')%></td>
+        <% } else { %>
+            <td><%= form.meta.submitted.toDateString()%><br><%= form.meta.sent.toLocaleTimeString('en-US')%></td>
+        <% } %>
+        <td><%= form.email %></td>
+        <td><%= form.organization %></td>
+        <td><%= form.template.name %></td>
+        <td class="center">
+                <% if (form.status == 'Sent') { %>
+                <img class="icon" src="/images/red_x.png"/>
+                <% } else { %>
+                <img class="icon" src="/images/green_checkmark.png"/>
+                <% } %>
+        </td>
+        <td class="center">
+            <img class="icon" src="/images/history.png" onclick="openHistory(<%= JSON.stringify({
+                id: form._id, email: form.email }) %>)"/>
+            <img class="icon clickable" src="/images/preview.png"/>
+        </td>
+    </tr>
+    <% }} %>
+    </tbody>
+</table>
+</div>
+<br>
+<table class="archive-table">
+    <thead>
+        <td class="center"><p class="archive-title">Archived Recommendation Templates</p></td>
+        <button id ="button-show-hide" onclick="showTable('table2')">+</button>
+    </thead>
+</table>
+<div id = "table2" style="display: none;">
+<table class="archive-table">
+    <tbody>
+    <% if (!templates.length)  { %>
+        <tr>
+            <td>
+                <div class="template-name">No Existing Recommendation Template</div>
+            </td>
+        </tr>
+    <% } else {
+        for (var template of templates) { %>
+    <tr>
+        <td>
+            <div class="template-name"><%= template.name %></div>
+            <div class="image-container">
+                <img class="icon" src="/images/preview.png" onclick="editTemplate('<%= template._id %>')"/>
+                <img class="icon" src="/images/restore.png" onclick="restoreTemplate('<%= template._id %>')"/>
+            </div>
+        </td>
+    </tr>
+    <% }} %>
+    </tbody>
+</table>
+</div>
+<br>
+<table class="archive-table">
+        <thead>
+        <td class="center"><p class="archive-title">Archived Email Templates</p></td>
+        <button id ="button-show-hide" onclick="showTable('table3')">+</button>
+        </thead>
+</table>
+<div id="table3" style="display: none;">
+<table class="archive-table">
+    <tbody>
+    <% if (!emailtemplates.length)  { %>
+        <tr>
+            <td>
+                <div class="template-name">No Existing letter Template</div>
+            </td>
+        </tr>
+    <% } else {
+        for (var template of emailtemplates) { %>
+    <tr>
+        <td>
+            <div class="template-name"><%= template.title %></div>
+            <div class="image-container">
+                <img class="icon" src="/images/preview.png" onclick="openModal( <%= JSON.stringify(template) %>)"/>
+                <img class="icon" src="/images/restore.png" onclick="restoreEmailTemplate('<%= template._id %>')"/>
+            </div>
+        </td>
+    </tr>
+    <% }} %>
+    </tbody>
+</table>
+</div>
+</div>
+<script>
+
+     // Get the modal
+     var modal = document.getElementById('myModal');
+
+    // When the user clicks on the button, open the modal
+    function openModal(email) {
+        var emailNameEle = document.getElementById("email-template-name");
+        emailNameEle.innerHTML = email.title; 
+
+        $('#modal-subject',$('#myModal')).val(email.subject);
+        $('#modal-body',$('#myModal')).val(email.body_text);
+        modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    function closeModal() {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    function openHistory(params) {
+        // Check to see if the status is green, if not then show error dialog
+        window.location.href = getDestinationRoute('http://localhost:3000/history', params);
+    }
+
+    // When the user clicks the preview icon, take them to the letter preview page.
+    function openLetterPreview(params, status) {
+        console.log(status);
+        // Check to see if the status is green, if not then show error dialog
+        if(status === 'Sent'){
+            window.alert("This letter cannot be previewed because the recommendee has not filled out the form!");
+        } else {
+            window.location.href = getDestinationRoute('http://localhost:3000/letter-preview', params);
+        }  
+    }
+
+    function editTemplate(id) {
+        $.ajax({
+            url: 'http://localhost:3000/template-editor/deactivated-edit',
+            data: {id},
+            type: 'GET',
+            complete: function (data) {
+                var params = data.responseJSON;
+                console.log('complete');
+                window.location.href = getDestinationRoute('http://localhost:3000/template-editor', params);
+            },
+            error: function () {
+                console.log('error');
+            }
+        });
+    }
+
+    function restoreTemplate(id) {
+        $.ajax({
+            url: 'http://localhost:3000/archive/restore-template',
+            data: {id},
+            type: 'POST',
+            complete: function () {
+                console.log('complete');
+                window.location.reload(false);
+            },
+            error: function () {
+                console.log('error');
+            }
+        });
+    }
+
+    function restoreEmailTemplate(id) {
+        $.ajax({
+            url: 'http://localhost:3000/archive/restore-email-template',
+            data: {id},
+            type: 'POST',
+            complete: function () {
+                console.log('complete');
+                window.location.reload(false);
+            },
+            error: function () {
+                console.log('error');
+            }
+        });
+    }
+
+    function getDestinationRoute(address, params) {
+        return address + '?' + $.param(params);
+    }
+
+    function showTable(id){
+        var x = document.getElementById(id);
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+
+</script>
+</body>
+</html>

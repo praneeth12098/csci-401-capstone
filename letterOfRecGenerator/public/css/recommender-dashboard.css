@@ -1,56 +1,25 @@
-.title {
+.recommendations{
     background-color: #FFFFFF;
-    font-size: 32px;
-    margin: 0px;
-    padding: 20px 8px;
 }
 
-body {
-    background-color: #F2F2F2;
-}
-/* The Modal (background) */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+#recommendations-modal {
+    height: 600px;
+    margin-top: 2%; 
+    margin-left: auto; 
+    margin-right: auto; 
 }
 
 .add-btn {
-    background-color: #C4C4C4;
-    border-radius: 50%;
-    bottom: 8px;
+    background-color: #FFFFFF;
     cursor: pointer;
     display: table-cell;
-    font-size: 28px;
-    line-height: 40px;
-    height: 40px;
-    position: fixed;
+    font-size: 15px;
+    height: 20px;
+    width:213px;
+    border: 0.1px solid black;
+    position: relative;
+    float: right;
     right: 8px;
-    text-align: center;
-    vertical-align: middle;
-    width: 40px;
-    z-index: 1;
-}
-
-/* Modal Content/Box */
-.modal-content {
-    background-color: #FFFFFF;
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
-    width: 60%; /* Could be more or less, depending on screen size */
-}
-
-.modal-title {
-    color: #EB5757;
-    font-size: 36px;
-    margin: 0;
 }
 
 /* The Close Button */
@@ -83,9 +52,28 @@ body {
 }
 
 .input-text {
+    margin-left: 20px;
     font-size: 20px;
-    line-height: 20px;
+    line-height: 10px;
     width: 75%;
+}
+
+.subject-text{
+    height: 5px;
+}
+
+.email-container{
+    margin-left : 20px;
+}
+
+#body-text{
+    height: 300px;
+    width: 95%;
+    font-size: 13px;
+    padding-bottom: 5px;
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
 }
 
 .input-dropdown {
@@ -107,39 +95,27 @@ body {
     height: 50px;
 }
 
-table {
-    background-color: #FFFFFF;
-    border-collapse: collapse;
-    font-size: 20px;
-    width: 100%;
-}
-
-td {
-    padding-left: 8px;
-}
-
-table thead tr {
-    border-bottom: solid 1px black;
-}
-
-table tbody tr {
-    border-bottom: solid 1px black;
-    height: 150px;
-}
-
-td.center {
-    text-align: center;
-}
-
-table tbody tr:last-child {
-    border-bottom: none;
-}
-
 img.icon {
-    height: 30px;
-    width: 30px;
+    height: 25px;
+    width: 25px;
+    opacity: 1.0; 
+    
+    margin-left: 5px; 
 }
 
 img.clickable {
     cursor: pointer;
+    transition: 0.8s;
+}
+
+img.clickable:hover {
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+.template-name {
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }

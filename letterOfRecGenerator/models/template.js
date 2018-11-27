@@ -9,7 +9,7 @@ var TemplateSchema = new Schema({
         number: Number,
         type: {
             type: String,
-            enum: ['Radio Button', 'Checkbox', 'Text'],
+            enum: ['Radio Button', 'Checkbox', 'Text', 'Custom'],
             required: true
         },
         question: String,
@@ -19,7 +19,8 @@ var TemplateSchema = new Schema({
             fill: String,
             tag: String
         }],
-        optional: Boolean
+        optional: Boolean,
+        organizationFlag: Boolean
     }],
     letterheadImg: String,
     footerImg: String
@@ -39,6 +40,22 @@ TemplateSchema.methods.getText = function () {
 
 TemplateSchema.methods.getQuestions = function () {
     return this.questions;
+};
+
+TemplateSchema.methods.getLetterheadImg = function () {
+    return this.letterheadImg;
+};
+
+TemplateSchema.methods.getFooterImg = function () {
+    return this.footerImg;
+};
+
+TemplateSchema.methods.getTags = function () {
+    var allTags = [];
+    for(let q = 0; q < this.questions.length; q++) {
+        allTags.push(this.questions[q].tag);
+    }
+    return allTags;
 };
 
 var Template = db.model('Template', TemplateSchema);

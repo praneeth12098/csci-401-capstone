@@ -3,33 +3,74 @@
 <head>
     <title><%= title %></title>
     <link rel="stylesheet" href="/stylesheets/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/all.css"/>
     <link rel="stylesheet" type="text/css" href="/css/template-dashboard.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/table.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/modal.css"/>
 </head>
 <body>
 <header>
     <% include ../partials/header %>
 </header>
 <p class="title"><%= title %></p>
-<div class="addBtn" onclick="openModal()">+</div>
+
+<div class="templates">
 
 <div id="myModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content template-modal">
         <div class="close-container">
             <span class="close" onclick="closeModal()">&times;</span>
         </div>
-        <p class="modal-title">Create New Template</p>
+        <p class="modal-title">Create A New Recommendation Template</p>
         <form class="input-form" method="GET" action="/template-editor">
-            <input class="input-text" type="text" name="title">
+            <div class="template-name-cont">
+                <label class="input-label"> Template Name: </label>
+                <input class="input-text" type="text" name="title">
+            </div>
             <input class="input-submit" type="submit" value="Create">
         </form>
     </div>
 </div>
+
+<div id="myModal_email" class="modal">
+    <div class="modal-content template-modal">
+        <div class="close-container">
+            <span class="close" onclick="closeEmailModal()">&times;</span>
+        </div>
+        <p class="modal-title">Create A New Email Template</p>
+        <form class="input-form" method="GET" action="/email-template-editor">
+            <div class="template-name-cont">
+                <label class="input-label"> Template Name: </label>
+                <input class="input-text" type="text" name="title">
+            </div>
+            <input class="input-submit" type="submit" value="Create">
+        </form>
+    </div>
+</div>
+
+<br>
+<br>
+
 <table>
     <thead>
-    <td class="center">Templates</td>
+        <tr>
+            <td class="subtitle_cont">
+                <b class="subtitle">My Recommendation Templates</b>
+                <button class="addBtn" onclick="openModal()">
+                    <img class="icon" src="/images/add_template.png" width="30" height="10">
+                </button>
+            </td>
+        </tr>
     </thead>
     <tbody>
-    <% for (var template of templates) { %>
+    <% if (!templates.length)  { %>
+    <tr>
+        <td>
+            <div class="template-name">No Existing Recommendation Template</div>
+        </td>
+    </tr>
+    <% } else {
+            for (var template of templates) { %>
     <tr>
         <td>
             <div class="template-name"><%= template.name %></div>
@@ -39,23 +80,75 @@
             </div>
         </td>
     </tr>
-    <% } %>
+    <%      }
+       }  %>
     </tbody>
 </table>
+<br>
+<table class="table-cont">
+    <thead>
+        <tr>
+            <td class="subtitle_cont">
+                <b class="subtitle">My Email Templates</b>
+                <button class="addBtn" onclick="openEmailModal()">
+                    <img class="icon" src="/images/add_email_template.png" width="50" height="70">
+                </button>
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+    <% if (!emailtemplates.length)  { %>
+        <tr>
+            <td>
+                <div class="template-name">No Existing Email Template</div>
+            </td>
+        </tr>
+
+    <% } else {
+        for (var template of emailtemplates) {
+    %>
+    <tr >
+        <td>
+            <div class="template-name"><%= template.title %></div>
+            <div class="image-container">
+                <img class="icon" src="/images/pencil.png" onclick="editEmailTemplate('<%= template._id %>')"/>
+                <img class="icon" src="/images/delete.png" onclick="deleteEmailRow('<%= template._id %>')"/>
+            </div>
+        </td>
+    </tr>
+    <% }} %>
+    </tbody>
+</table>
+</div>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+    var recommendation_button = document.getElementById("recommendation-button");
+    recommendation_button.innerHTML = '<img src="/images/add_template.png" />';
+    var email_button = document.getElementById("email-button");
+    email_button.innerHTML = '<img src="/images/add_email_template.png" />';
+</script>
 <script>
     // Get the modal
     var modal = document.getElementById('myModal');
+    var modal_email = document.getElementById('myModal_email');
 
     // When the user clicks on the button, open the modal
     function openModal() {
         modal.style.display = "block";
     }
 
+    function openEmailModal() {
+        modal_email.style.display = "block";
+    }
+
     // When the user clicks on <span> (x), close the modal
     function closeModal() {
         modal.style.display = "none";
+    }
+    
+    function closeEmailModal() {
+        modal_email.style.display = "none";
     }
 
     function editTemplate(id) {
@@ -74,10 +167,41 @@
         });
     }
 
+    function editEmailTemplate(id) {
+        $.ajax({
+            url: 'http://localhost:3000/email-template-editor/edit',
+            data: {id},
+            type: 'GET',
+            complete: function (data) {
+                var params = data.responseJSON;
+                console.log('complete');
+                window.location.href = getDestinationRoute('http://localhost:3000/email-template-editor', params);
+            },
+            error: function () {
+                console.log('error');
+            }
+        });
+    }
+
     // On click for trash icon
     function deleteRow(id) {
         $.ajax({
             url: `http://68.181.97.191:3000/template-dashboard/delete`,
+            data: {id},
+            type: 'POST',
+            complete: function () {
+                console.log('complete');
+                window.location.reload(false);
+            },
+            error: function () {
+                console.log('error');
+            }
+        });
+    }
+
+     function deleteEmailRow(id) {
+        $.ajax({
+            url: 'http://localhost:3000/template-dashboard/delete-email',
             data: {id},
             type: 'POST',
             complete: function () {
