@@ -20,11 +20,7 @@ var formatted;
 
 function onLoad() {
     $.ajax({
-<<<<<<< HEAD
         url: 'http://68.181.97.191:3000/letter-preview/form',
-=======
-        url: `http://68.181.97.191:3000/letter-preview/form`,
->>>>>>> 2b67b918e0b797b2dce01c02a188064efa61d945
         data: {id},
         type: 'GET',
         success: function (data) {
@@ -71,11 +67,7 @@ function saveEditModal() {
     editor.deleteInDirection("forward");
 
     $.ajax({
-<<<<<<< HEAD
         url: 'http://68.181.97.191:3000/letter-preview/save',
-=======
-        url: `http://68.181.97.191:3000/letter-preview/save`,
->>>>>>> 2b67b918e0b797b2dce01c02a188064efa61d945
         data: {
             id: id,
             letter: letterHTML

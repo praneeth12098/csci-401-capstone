@@ -286,11 +286,7 @@ function saveTemplate() {
 
     if (id) {
         $.ajax({
-<<<<<<< HEAD
             url: 'http://68.181.97.191:3000/template-editor/update',
-=======
-            url: `http://68.181.97.191:3000/template-editor/update`,
->>>>>>> 2b67b918e0b797b2dce01c02a188064efa61d945
             data: {
                 id: id,
                 template: template
@@ -302,11 +298,7 @@ function saveTemplate() {
             },
             success: function (data) {
                 console.log('success');
-<<<<<<< HEAD
                 window.location.href = 'http://68.181.97.191:3000/template-dashboard'
-=======
-                window.location.href = `http://68.181.97.191:3000/template-dashboard`
->>>>>>> 2b67b918e0b797b2dce01c02a188064efa61d945
             },
             error: function (err){
                 console.log('error in saveTemplate:' + err);
@@ -320,11 +312,7 @@ function saveTemplate() {
     } else {
         console.log("creating template");
         $.ajax({
-<<<<<<< HEAD
             url: 'http://68.181.97.191:3000/template-editor/create',
-=======
-            url: `http://68.181.97.191:3000/template-editor/create`,
->>>>>>> 2b67b918e0b797b2dce01c02a188064efa61d945
             data: {template: template},
             type: 'POST',
             complete: function () {
@@ -333,11 +321,7 @@ function saveTemplate() {
             success: function (data) {
                 id = data.id;
                 console.log('success');
-<<<<<<< HEAD
                 window.location.href = 'http://68.181.97.191:3000/template-dashboard'
-=======
-                window.location.href = `http://68.181.97.191:3000/template-dashboard`
->>>>>>> 2b67b918e0b797b2dce01c02a188064efa61d945
             },
             error: function (err) {
                 console.log('error in saveTemplate:' + err);
