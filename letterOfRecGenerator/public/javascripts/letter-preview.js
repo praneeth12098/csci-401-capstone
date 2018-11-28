@@ -20,13 +20,13 @@ var formatted;
 
 function onLoad() {
     $.ajax({
-        url: 'http://localhost:3000/letter-preview/form',
+        url: 'http://68.181.97.191:3000/letter-preview/form',
         data: {id},
         type: 'GET',
         success: function (data) {
             form = data;
             $.ajax({
-                url: 'http://localhost:3000/template-editor/template',
+                url: 'http://68.181.97.191:3000/template-editor/template',
                 data: {id: data.template._id,
                         saveSwitchData: true},
                 type: 'GET',
@@ -67,7 +67,7 @@ function saveEditModal() {
     editor.deleteInDirection("forward");
 
     $.ajax({
-        url: 'http://localhost:3000/letter-preview/save',
+        url: 'http://68.181.97.191:3000/letter-preview/save',
         data: {
             id: id,
             letter: letterHTML
@@ -94,7 +94,7 @@ function downloadLetter() {
     var datepicker = document.querySelectorAll("input[type=date]")[0]
     var date = datepicker.value
     $.ajax({
-        url: 'http://localhost:3000/letter-preview/drive',
+        url: 'http://68.181.97.191:3000/letter-preview/drive',
         data: {
             id:id,
             letter: letterHTML,
@@ -103,7 +103,7 @@ function downloadLetter() {
         type: 'POST',
         success: function(d){
             console.log("success in drive")
-            window.location.href = 'http://localhost:3000/recommender-dashboard';
+            window.location.href = 'http://68.181.97.191:3000/recommender-dashboard';
         },
         error: function() {
             console.log("error in drive")
@@ -186,7 +186,7 @@ function parseLetter(form) {
 function parseEmailLetter(body) {
 
     $.ajax({
-        url: 'http://localhost:3000/letter-preview/emailForm',
+        url: 'http://68.181.97.191:3000/letter-preview/emailForm',
         data: {id},
         type: 'GET',
         success: function (data) {
@@ -260,7 +260,7 @@ function addEmailHistory() {
     };
 
     $.ajax({
-        url: 'http://localhost:3000/letter-preview/addEmailHistory',
+        url: 'http://68.181.97.191:3000/letter-preview/addEmailHistory',
         data: {
             id: id,
             Email: Email
@@ -272,7 +272,7 @@ function addEmailHistory() {
         success: function (data) {
             id = data.id;
             console.log('success');
-            window.location.href = 'http://localhost:3000/history'
+            window.location.href = 'http://68.181.97.191:3000/history'
         },
         error: function () {
             console.log('addEmailHistory error');
