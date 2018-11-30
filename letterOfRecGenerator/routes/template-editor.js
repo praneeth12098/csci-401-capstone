@@ -158,6 +158,18 @@ router.post('/fileUpload', function (req,res, next) {
 
 })
 
+router.post('/fileSignatureUpload', function (req,res, next) {
+    console.log(req.files.file);
+    var file = req.files.file;
+    var signaturePath = __dirname + '/uploads/' + 'signature.pdf';
+    file.mv(signaturePath, function(err) {
+        if (err)
+          return res.status(500).send(err);
+
+    });
+
+})
+
 router.post('/create', function (req, res, next) {
     req.user.addTemplate(req.body.template, function (err, id) {
         if (err) {

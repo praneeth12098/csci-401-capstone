@@ -6,7 +6,7 @@ const months = ["January", "February", "March", "April", "May", "June", "July", 
 
 exports.htmlstuff = function(form) {
     var text = form;
-    text = text.replace(/\<\/strong\>/g, '');
+    text = text.replace(/\<\/strong\>/gi, '');
     text = text.replace(/\<strong\>/gi, '');
     text = text.replace(/<br\s*\/?>/gi, '\n');
     text = text.replace(/\u00a0/g, " ");

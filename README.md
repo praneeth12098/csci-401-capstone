@@ -12,7 +12,7 @@ Currently, our app is hosted on a server with IP address 68.181.97.191 on port 3
 ## Making Changes to Deployment (as of Fall 2018)
 + Ensure that any changes to be put on deployment are pushed into server-setup branch of this repo.
 + Run `ssh jeff@68.181.97.191`
-+ Enter the password as `csci-401`
++ Ask for ssh password from Prof. Miller 
 + Run `cd csci-401-capstone/letterOfRecGenerator` from root directrory
 + Run `git pull` (Run `git branch` to ensure that the branch is server-setup. If not, run `git checkout server-setup`)
 + Run `mongod --port 12345`

@@ -22,7 +22,6 @@ router.get('/', function (req, res, next) {
         } else {
             res.render('pages/letter-preview', {
                 title: form.email,
-                templates: req.user.getEmailTemplates(),
                 id: req.query.id,
                 form: form,
             });
@@ -39,8 +38,6 @@ router.get('/form', function (req, res, next) {
         }
     });
 });
-
-
 
 
 router.post('/save', function (req, res, next) {
@@ -72,33 +69,96 @@ router.post('/drive', function(req,res,next) {
             var formatted_letter = formatted_date + letter;
             var template = form.getTemplate();
             var templateName = template.name;
-            console.log(formatted_letter);
+            console.log("THIS IS FORMATTED:" + formatted_letter);
 
             var text = letterParser.htmlstuff(formatted_letter)
+            var longText = text.replace(/(\r\n|\n|\r)/gm, "<br>");
+            // text = text.replace(/(\n)/gm, '')
             var fname = form.responses[0].response;
             var lname = form.responses[1].response;
-            var length = text.length;
-            var stringWords = text.split(' ');
+            var length = longText.length;
+            console.log("TEXT:" + text)
+            var stringWords = longText.split(' ');
+            console.log("words: " + stringWords)
+            var para = longText.split('<br>');
+            console.log("PAR:" + para)
             var stringlen = stringWords.length;
+            console.log("LEN: " + stringlen)
+            console.log("PARAG:" + para.length)
             var firstPage = "";
             var secondPage = "";
             // If it is larger than one page break it into two
-            if (stringlen > 470){
+            if (stringlen > 510){
                  
-                for(var i = 0; i < 470;i++){
+                for(var i = 0; i < 510; i++){
+                   
+                    if(stringWords[i].includes("<br>")){
+                        console.log("Hello")
+                        stringWords[i] = stringWords[i].replace("<br><br>", "\n\n")
+                        stringWords[i] = stringWords[i].replace("<br>", "\n")
+                        stringWords[i] = stringWords[i].replace("<br> <br>", "\n \n")
+                        console.log("WORD: " + stringWords[i])
+                    }
                     firstPage += stringWords[i];
                     firstPage += " ";
                 }
+                // Write on first page up until last paragraph
+                console.log("WTF")
+                var counter = 510;
 
-                var remain = stringlen - 430;
+                while(counter < stringlen){
+                    console.log("POOP: " + stringWords[counter])
+                    if(stringWords[counter].includes("<br>")){
+                        console.log("BRUH")
+                        var index = stringWords[counter].indexOf("<br>");
+                        var first = stringWords[counter].substr(0, index);
+                        var second = stringWords[counter].substr(index);
+                        // stringWords[counter] = stringWords[counter].replace("<br><br>", "\n\n")
+                        // stringWords[counter] = stringWords[counter].replace("<br>", "\n")
+                        // stringWords[counter] = stringWords[counter].replace("<br> <br>", "\n \n")
+
+                        console.log("INSIDE: " + stringWords[counter])
+                        console.log("first:" + first);
+                        console.log("second:" + second)
+                        // firstPage += stringWords[counter];
+                        // firstPage += " ";
+                        firstPage += first;
+                        firstPage += " ";
+                        // Attach second part to next word inside array
+                        var next = stringWords[counter + 1];
+                        stringWords[counter + 1] = second + " " + next;
+                        counter = counter + 1;
+                        break;
+                    }
+                    else {
+                        firstPage += stringWords[counter];
+                        firstPage += " ";
+                        counter = counter + 1;
+                    } 
+                    
+                }
+
+                console.log("LOOP")
+                console.log("Counter: " + counter)
+
+                var remain = stringlen - counter;
                 
-                for(var i = 471; i < stringlen;i++){
+                for(var i = counter; i < stringlen;i++){
+                    if(stringWords[i].includes("<br>")){
+                        stringWords[i] = stringWords[i].replace("<br><br>", "\n\n")
+                        stringWords[i] = stringWords[i].replace("<br>", "\n")
+                        stringWords[i] = stringWords[i].replace("<br> <br>", "\n \n")
+                    }
                     secondPage += stringWords[i];
+                    console.log(stringWords[i])
                     secondPage += " ";
                 }
+
             }
 
+            // console.log("REMAIN: " + remain)
             var headerPath = __dirname + '/uploads/' + 'uploaded.pdf';
+            var signaturePath = __dirname + '/uploads/' + 'signature.pdf';
 
             var outputName = templateName + "_Template_" + fname + "_" + lname + ".pdf";
             var downloadFolder = downloadsFolder() + '/';
@@ -108,13 +168,16 @@ router.post('/drive', function(req,res,next) {
             const HummusRecipe = require('hummus-recipe');
             const pdfDoc = new HummusRecipe(headerPath, output);
             pdfDoc.registerFont('Times', fontDirectory);
+
+            // console.log("COUNTER: " + counter)
+            var signature_pos = remain + 50;
             /**  
              * The current problem is that bolded text that use <strong>txt</strong> can't be
              * converted and kept bold. So we need to find where the location of the text
              * and bold it through hummus-reciper (can be found on npm website for hummus-recipe)
              * but this cannot be done right now.
             */
-            if(stringlen > 470){
+            if(stringlen > 520){
                 pdfDoc
                 // edit 1st page
                 .editPage(1)
@@ -146,30 +209,58 @@ router.post('/drive', function(req,res,next) {
                         }
                     }
                 })
+                .image(signaturePath, 20, signature_pos , {width: 500, keepAspectRatio: true})
                 .endPage()
                 .endPDF();
             }
             else {
-                pdfDoc
+                // One page but find out where signature needs to go
+                if(stringlen > 300){ 
+                    pdfDoc
                 // edit 1st page
-                .editPage(1)
-                .text(text, 80, 85, {
-                    color: '000000',
-                    font: 'Times',
-                    fontSize: 11,
-                    align: 'left',
-                    textBox: {
-                        width: 480,
-                        lineHeight: 14,
-                        style: {
-                            lineWidth: 1
+                    .editPage(1)
+                    .text(text, 80, 85, {
+                        color: '000000',
+                        font: 'Times',
+                        fontSize: 11,
+                        align: 'left',
+                        textBox: {
+                            width: 480,
+                            lineHeight: 14,
+                            style: {
+                                lineWidth: 1
+                            }
                         }
-                    }
-                })
-                .endPage()
-                .endPDF();
+                    })
+                    .endPage()
+                    .insertPage(1, signaturePath, 1)
+                    .endPDF();
+                } else {
+                    // Keep it on the first page
+                     pdfDoc
+                    // edit 1st page
+                    .editPage(1)
+                    .text(text, 80, 85, {
+                        color: '000000',
+                        font: 'Times',
+                        fontSize: 11,
+                        align: 'left',
+                        textBox: {
+                            width: 480,
+                            lineHeight: 14,
+                            style: {
+                                lineWidth: 1
+                            }
+                        }
+                    })
+                    .image(signaturePath, 20, 400, {width: 600, keepAspectRatio: true})
+                    .endPage()
+                    .endPDF();
+                }
+                
             }
             opn(output);
+            res.redirect('/recommender-dashboard');
         }
 
     })

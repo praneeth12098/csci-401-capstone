@@ -88,8 +88,11 @@
         </td>
         <td class="center">
             <img class="icon" src="/images/history.png" onclick="openHistory(<%= JSON.stringify({
-                id: form._id, email: form.email }) %>)"/>
-            <img class="icon clickable" src="/images/preview.png"/>
+                id: form._id
+            }) %>, '<%= form.status %>')"/>
+            <img class="icon clickable" title="Preview Letter" src="/images/preview.png" onclick="openLetterPreview(<%= JSON.stringify({
+                id: form._id 
+            }) %>, '<%= form.status %>')"/>
         </td>
     </tr>
     <% }} %>
@@ -193,7 +196,6 @@
 
     // When the user clicks the preview icon, take them to the letter preview page.
     function openLetterPreview(params, status) {
-        console.log(status);
         // Check to see if the status is green, if not then show error dialog
         if(status === 'Sent'){
             window.alert("This letter cannot be previewed because the recommendee has not filled out the form!");
@@ -260,8 +262,6 @@
             x.style.display = "none";
         }
     }
-
-
 </script>
 </body>
 </html>

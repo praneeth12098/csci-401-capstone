@@ -115,7 +115,7 @@
             <img class="icon clickable" title="Preview Letter" src="/images/preview.png" onclick="openLetterPreview(<%= JSON.stringify({
                 id: form._id
             }) %>, '<%= form.status %>')"/>
-            <img class="icon clickable" title="Delete Letter" src="/images/delete.png" onclick="deleteRow('<%= form._id %>')"/>
+            <img class="icon clickable" title="Delete Letter" src="/images/archive.png" onclick="deleteRow('<%= form._id %>')"/>
         </td>
     </tr>
     <% }} %>
@@ -180,6 +180,8 @@
     }
 
     function openLetterPreview(params, status) {
+        console.log(status);
+        console.log(params);
         // Check to see if the status is green, if not then show error dialog
         if(status === 'Sent'){
             window.alert("This letter cannot be previewed because the recommendee has not filled out the form!");
