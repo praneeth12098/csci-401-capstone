@@ -90,7 +90,7 @@ app.use('/users', isAuthenticated, users);
 app.use('/history', history);
 app.use('/archive', archive);
 app.use('/response', response);
-app.use('/docx', docxVar);
+// app.use('/docx', docxVar);
 
 
 
