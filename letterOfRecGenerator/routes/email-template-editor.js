@@ -1,6 +1,8 @@
 var express = require('express');
 var User = require('../models/user');
 
+Access-Control-Allow-Credentials: true
+
 var router = express.Router();
 
 router.get('/', function (req, res, next) {
