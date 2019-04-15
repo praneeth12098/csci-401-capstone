@@ -32,7 +32,6 @@ var history = require('./routes/history');
 var archive = require('./routes/archive');
 var response = require('./routes/response');
 var emailLetterPreview = require('./routes/email-letter-preview');
-var docxVar = require('./routes/docx');
 
 var app = express();
 
@@ -90,7 +89,6 @@ app.use('/users', isAuthenticated, users);
 app.use('/history', history);
 app.use('/archive', archive);
 app.use('/response', response);
-// app.use('/docx', docxVar);
 
 
 
