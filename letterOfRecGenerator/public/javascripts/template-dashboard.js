@@ -1,5 +1,5 @@
 function saveTemplate() {
-    console.log("@@@@@@@@@@@@@@@@ HERE @@@@@@@@@@@@@@@@@@@@@@");
+
     var template = document.getElementById("template").value;
     $.ajax({
         url: 'http://68.181.97.191.xip.io:3000/template-dashboard/uploadLetterTemplate',
