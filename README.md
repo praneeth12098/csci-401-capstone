@@ -13,10 +13,20 @@ Currently, our app is hosted on a server with IP address 68.181.97.191 on port 3
 + Ensure that any changes to be put on deployment are pushed into server-setup branch of this repo.
 + Run `ssh jeff@68.181.97.191`
 + Ask for ssh password from Prof. Miller 
-+ Run `cd csci-401-capstone/letterOfRecGenerator` from root directrory
++ Run `cd csci-401-capstone-2019/csci-401-capstone/letterOfRecGenerator` from root directrory
 + Run `git pull` (Run `git branch` to ensure that the branch is server-setup. If not, run `git checkout server-setup`)
-+ Run `mongod --port 12345`
-+ Run `npm run devstart`
+
++ Note, session management uses tmux.
++ To list active sessions run `tmux ls`
++ To view mongod session run `tmux attach-session -t 0`
++ To view project session run `tmux attach-session -t 15`
++ After attaching to a session, to exit push `ctrl+b` then `d`
++ To kill a session run `tmux kill-session -t {session number}`
++ If project session is accidentally killed, simply run the below command from the `/letterOfRecGenerator` and then exit by pushing `ctrl+b` then `d`
++ If mongod session is accidentally killed, simply run the below command from the `/letterOfRecGenerator` and then exit by pushing `ctrl+b` then `d`
+
++ To restart/start mongod, attach to mongod session using the above command and run `mongod --port 12345`
++ To restart/start the project session, attach to the session using the above command and run `npm run devstart`
 
 For the last step, you may need to kill the previous process on port 3000 using the following steps:
 + Run `sudo lsof -n -i :3000 | grep LISTEN`
