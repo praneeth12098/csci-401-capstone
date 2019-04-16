@@ -32,6 +32,7 @@ var history = require('./routes/history');
 var archive = require('./routes/archive');
 var response = require('./routes/response');
 var emailLetterPreview = require('./routes/email-letter-preview');
+var docxVar = require('./routes/docx');
 
 var app = express();
 
@@ -61,7 +62,7 @@ app.set('view engine', 'ejs');
 app.use(favicon(path.join(__dirname, 'public', 'favicon.png')));
 
 app.get('/auth/google', passport.authenticate('google', {
-    scope: ['profile', 'https://www.googleapis.com/auth/gmail.send', 'https://www.googleapis.com/auth/drive'],
+    scope: ['profile', 'https://www.googleapis.com/auth/gmail.send'],
     prompt: 'select_account'
 }));
 
@@ -89,6 +90,7 @@ app.use('/users', isAuthenticated, users);
 app.use('/history', history);
 app.use('/archive', archive);
 app.use('/response', response);
+// app.use('/docx', docxVar);
 
 
 
