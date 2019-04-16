@@ -1,7 +1,7 @@
 # csci-401-capstone
-Repo for hosting Letter of Recommendation Generator Capstone Project as of Fall 2018
+Repo for hosting Letter of Recommendation Generator Capstone Project as of Spring 2019
 
-## Deployment (as of Fall 2018)
+## Deployment (as of Spring 2019)
 Currently, our app is hosted on a server with IP address 68.181.97.191 on port 3000, with the MongoDB instance on the same IP address but at port 12345.
 
 ## How to Run Locally
@@ -10,7 +10,7 @@ Currently, our app is hosted on a server with IP address 68.181.97.191 on port 3
 + Open up a browser tab to `127.0.0.1:3000` (make sure port 3000 was not already occupied)
 + Run `npm install` from `\letterOfRecGenerator` and also specifically run `npm install docxtemplater` and `npm install jszip2`
 
-## Making Changes to Deployment (as of Fall 2018)
+## Making Changes to Deployment (as of Spring 2019)
 + Ensure that any changes to be put on deployment are pushed into server2019 branch of this repo.
 + Run `ssh jeff@68.181.97.191`
 + Ask for ssh password from Prof. Miller 
