@@ -8,6 +8,7 @@ Currently, our app is hosted on a server with IP address 68.181.97.191 on port 3
 + Enter letterOfRecGenerator folder
 + Run `DEBUG=letterOfRecGenerator:* npm run devstart` (for debug on console) or `npm run devstart`
 + Open up a browser tab to `127.0.0.1:3000` (make sure port 3000 was not already occupied)
++ Run `npm install` from `\letterOfRecGenerator` and also specifically run `npm install docxtemplater` and `npm install jszip2`
 
 ## Making Changes to Deployment (as of Fall 2018)
 + Ensure that any changes to be put on deployment are pushed into server2019 branch of this repo.
