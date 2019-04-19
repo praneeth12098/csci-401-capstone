@@ -28,44 +28,6 @@
             </div>
         </div>
 
-        <div class="flex-display upload-cont">
-            <h2 id="upload-letterhead" class="section-header">Upload Template</h2>
-            <div class="upload-preview-container flex1">
-
-                <% if(locals.letterheadImage){ %>
-                <img id="letterhead-preview" src="<%= letterheadImage %>" alt=""/>
-                <% } else{ %>
-                <img id="letterhead-preview" src="#" alt=""/>
-                <% } %>
-                <div id="letterhead-preview-div"></div>
-                <form id="letterhead-upload" action="/template-editor/fileUpload" method="POST" encType="multipart/form-data" onsubmit="changeText()">
-                    <input type="file" name="file" id="letterhead-upload-file"/>
-                    <input id="file-submit" type="submit" name="Submit"/>
-                </form>
-            </div>
-        </div>
-
-        <div class="flex-display upload-cont">
-            <h2 id="upload-footer" class="section-header">Upload Custom Signature</h2>
-            <div class="upload-preview-container flex1">
-                <% if(locals.footerImage){ %>
-                <img id="footer-preview" src="<%= footerImage %>" alt=""/>
-                <% } else{ %>
-                <img id="footer-preview" src="#" alt=""/>
-                <% } %>
-                <div id="footer-preview-div"></div>
-           <!--      <form id="footer-upload">
-                    <input type="file" name="file" id="footer-upload-file"/>
-                    <input type="submit" name="Submit"/>
-                </form> -->
-                <form id="footer-upload" action="/template-editor/fileSignatureUpload" method="POST" encType="multipart/form-data" onsubmit="changeFooterText()">
-                    <input type="file" name="file" id="footer-upload-file"/>
-                    <input id="submit" type="submit" name="Submit"/>
-                </form>
-            </div>
-        </div>  
-
-
         <h2 id="custom-questions" class="section-header">Custom Questions</h2>
         <button class="large-circle-button" onclick="addQuestion()">+ Add question</button>
         <div id="questions-container"></div>
