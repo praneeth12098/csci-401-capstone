@@ -56,16 +56,10 @@
                             //return pair[1];
                         }
                     }
-                    
+                    //document.getElementById("id1").value = "cok"; 
                     </script>
-                    <script type="text/javascript">
-                        function test2() {
-                            var pageId = document.getElementById("id1").value;
-                            console.log(pageId);
-                         
-                        }
-                    </script>
-                    
+                    <p class = "date-comment">Enter date: </p>
+                    <input type = "date" id = "theDate" name = "date">
                     <input id="saveButton" type="submit" name="Submit" value="Save Letter" onclick="saveLetter()"/>
                 </form>
                 <button id = "downloadButton" onclick = "downloadLetter()">Download Letter</button>
@@ -98,7 +92,16 @@
             
     </div>
     </body>
-
+<script>
+  var date = new Date();
+  var day = date.getDate();
+  var month = date.getMonth() + 1;
+  var year = date.getFullYear();
+  if (month < 10) month = "0" + month;
+  if (day < 10) day = "0" + day;
+  var today = year + "-" + month + "-" + day;
+  document.getElementById('theDate').value = today;
+</script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </html>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     

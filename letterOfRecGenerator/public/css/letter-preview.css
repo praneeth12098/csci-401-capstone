@@ -68,7 +68,7 @@
 
 
 
-.footer-img {
+ .date-comment, #theDate { margin-left: 60px; } .footer-img {
     margin-top: 10px;
 }
 
