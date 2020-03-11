@@ -44,8 +44,6 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-  var gmailClass = google.gmail('v1');
-  var email_lines = [];
   var currentUser = req.user;
   var userId = currentUser._id;
   var subject = req.body.subject_text;
@@ -71,19 +69,7 @@ router.post('/', function (req, res, next) {
             }
       });
 
-      email_lines.push('To: ' + toEmail);
-      email_lines.push('Content-type: text/html;charset=iso-8859-1');
-      email_lines.push('MIME-Version: 1.0');
-      email_lines.push('Subject: ' + subject);
-      email_lines.push('');
-      var url = encodeURI('http://localhost:3000/form-entry/' + form.getLink());
-      email_lines.push('<p>' + body + '<a href = "' + url + '"> link</a></p>');
-
-      var email = email_lines.join('\r\n').trim();
-      var base64EncodedEmail = new Buffer(email).toString('base64');
-      base64EncodedEmail = base64EncodedEmail.replace(/\+/g, '-').replace(/\//g, '_');
-
-      var url = encodeURI('http://localhost:3000/form-entry/' + form.getLink());
+    var url = encodeURI('http://localhost:3000/form-entry/' + form.getLink());
 
     // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
@@ -117,15 +103,6 @@ router.post('/', function (req, res, next) {
         console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 
         res.render('contact', {msg:'Email has been sent'});
-    });
-
-    // sending email
-    gmailClass.users.messages.send({
-        access_token: req.user.accessToken,
-        userId: 'me',
-        resource: {
-            raw: base64EncodedEmail
-        }
     });
 
     res.redirect('/recommender-dashboard');
