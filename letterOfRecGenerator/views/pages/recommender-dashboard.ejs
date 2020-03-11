@@ -113,15 +113,15 @@
             var timeA, timeB;
 
             if (a.meta.submitted) {
-                timeA = a.meta.submitted;
+                timeB = a.meta.submitted; //switch to timeA if you want to sort from oldest to newest
             } else {
-                timeA = a.meta.sent;
+                timeB = a.meta.sent; //switch to timeA if you want to sort from oldest to newest
             }
 
             if (b.meta.submitted) {
-                timeB = b.meta.submitted;
+                timeA = b.meta.submitted; //switch to timeB if you want to sort from oldest to newest
             } else {
-                timeB = b.meta.sent;
+                timeA = b.meta.sent; //switch to timeB if you want to sort from oldest to newest
             }
 
             if (timeA == timeB)
@@ -135,6 +135,7 @@
         clearTable(tableNumber);
         generateTable(tableNumber);
     }
+    sortByTime(0);
 
     function sortByEmail(tableNumber) {
         emailSortOrder *= -1;
