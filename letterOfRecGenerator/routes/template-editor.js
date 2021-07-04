@@ -4,6 +4,9 @@ var User = require('../models/user');
 var router = express.Router();
 
 router.get('/', function (req, res, next) {
+
+    console.log("TE, User Exists: ", req.user);
+
     var letterheadImg;
     var footerImg;
     var saveStatus = req.query.saveSwitch;
@@ -48,13 +51,13 @@ router.get('/', function (req, res, next) {
             questions: [{ question: "What is your first name?",
                           tag: "<!FNAME>"},
                         { question: "What is your last name?",
-                          tag: "<!LNAME>"}, 
+                          tag: "<!LNAME>"},
                         { question: "What is your preferred personal pronoun (subject)?",
-                          tag: "<!SUB_PRONOUN>"}, 
+                          tag: "<!SUB_PRONOUN>"},
                         { question: "What is your preferred personal pronoun (object)",
-                          tag: "<!OBJ_PRONOUN>"}, 
+                          tag: "<!OBJ_PRONOUN>"},
                         { question: "What is your preferred possessive pronoun?",
-                          tag: "<!POS_PRONOUN>"}, 
+                          tag: "<!POS_PRONOUN>"},
                         { question: "What organizations are you applying to?",
                           tag: "<!ORG>"}]
         });
@@ -79,13 +82,13 @@ router.get('/edit', function (req, res, next) {
             questions: [{ question: "What is your first name?",
                             tag: "<!FNAME>"},
                         { question: "What is your last name?",
-                            tag: "<!LNAME>"}, 
+                            tag: "<!LNAME>"},
                         { question: "What is your preferred personal pronoun (subject)?",
-                            tag: "<!SUB_PRONOUN>"}, 
+                            tag: "<!SUB_PRONOUN>"},
                         { question: "What is your preferred personal pronoun (object)",
-                            tag: "<!OBJ_PRONOUN>"}, 
+                            tag: "<!OBJ_PRONOUN>"},
                         { question: "What is your preferred possessive pronoun?",
-                            tag: "<!POS_PRONOUN>"}, 
+                            tag: "<!POS_PRONOUN>"},
                         { question: "What organizations are you applying to?",
                             tag: "<!ORG>"}]
         });
@@ -110,13 +113,13 @@ router.get('/deactivated-edit', function (req, res, next) {
             questions: [{ question: "What is your first name?",
                             tag: "<!FNAME>"},
                         { question: "What is your last name?",
-                            tag: "<!LNAME>"}, 
+                            tag: "<!LNAME>"},
                         { question: "What is your preferred personal pronoun (subject)?",
-                            tag: "<!SUB_PRONOUN>"}, 
+                            tag: "<!SUB_PRONOUN>"},
                         { question: "What is your preferred personal pronoun (object)",
-                            tag: "<!OBJ_PRONOUN>"}, 
+                            tag: "<!OBJ_PRONOUN>"},
                         { question: "What is your preferred possessive pronoun?",
-                            tag: "<!POS_PRONOUN>"}, 
+                            tag: "<!POS_PRONOUN>"},
                         { question: "What organizations are you applying to?",
                             tag: "<!ORG>"}]
         });
@@ -143,7 +146,7 @@ router.get('/template', function (req, res, next) {
             questions: req.user.getDeactivatedTemplate(req.query.id).getQuestions()
         });
     }
-    
+
 });
 
 router.post('/fileUpload', function (req,res, next) {
@@ -158,19 +161,9 @@ router.post('/fileUpload', function (req,res, next) {
 
 })
 
-router.post('/fileSignatureUpload', function (req,res, next) {
-    console.log(req.files.file);
-    var file = req.files.file;
-    var signaturePath = __dirname + '/uploads/' + 'signature.pdf';
-    file.mv(signaturePath, function(err) {
-        if (err)
-          return res.status(500).send(err);
-
-    });
-
-})
-
 router.post('/create', function (req, res, next) {
+
+    console.log("USER EXISTS: ", req.user);
     req.user.addTemplate(req.body.template, function (err, id) {
         if (err) {
             if(err.message == "DUPLICATE NAME") {
@@ -212,7 +205,7 @@ router.post('/uploadLetterTemplate', function(req,res,next){
         }
     });
 
-    console.log("about to print file;::");
+    console.log("about to print file");
     console.log(file);
 
 })
